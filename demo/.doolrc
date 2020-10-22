@@ -1,0 +1,6 @@
+{
+  "entry": {
+    "main": "./index.js"
+  },
+  "outputPath": "."
+}
