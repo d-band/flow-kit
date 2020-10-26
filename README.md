@@ -5,7 +5,7 @@ Workflow for React
 
 [![NPM version](https://img.shields.io/npm/v/flow-kit.svg)](https://www.npmjs.com/package/flow-kit)
 [![NPM downloads](https://img.shields.io/npm/dm/flow-kit.svg)](https://www.npmjs.com/package/flow-kit)
-[![Greenkeeper badge](https://badges.greenkeeper.io/d-band/flow-kit.svg)](https://greenkeeper.io/)
+[![Known Vulnerabilities](https://snyk.io/test/github/d-band/flow-kit/badge.svg?targetFile=package.json)](https://snyk.io/test/github/d-band/flow-kit?targetFile=package.json)
 
 ## Install
 
