@@ -65,7 +65,7 @@ render(
 );
 ```
 
-![image](demo/screenshot.png)
+<img src="demo/screenshot.png" width="450">
 
 ## Report a issue
 
