@@ -39,7 +39,4 @@ rules:
   jsx-a11y/control-has-associated-label: 0
   jsx-a11y/click-events-have-key-events: 0
   react-hooks/rules-of-hooks: 2
-
-parserOptions:
-  ecmaFeatures:
-    experimentalObjectRestSpread: true
+  react-hooks/exhaustive-deps: 1
