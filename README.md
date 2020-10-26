@@ -3,24 +3,24 @@ Workflow for React
 
 > Workflow for react with sugiyama layout algorithm.
 
-[![NPM version](https://img.shields.io/npm/v/react-workflow.svg)](https://www.npmjs.com/package/react-workflow)
-[![NPM downloads](https://img.shields.io/npm/dm/react-workflow.svg)](https://www.npmjs.com/package/react-workflow)
-[![Greenkeeper badge](https://badges.greenkeeper.io/d-band/react-workflow.svg)](https://greenkeeper.io/)
+[![NPM version](https://img.shields.io/npm/v/flow-kit.svg)](https://www.npmjs.com/package/flow-kit)
+[![NPM downloads](https://img.shields.io/npm/dm/flow-kit.svg)](https://www.npmjs.com/package/flow-kit)
+[![Greenkeeper badge](https://badges.greenkeeper.io/d-band/flow-kit.svg)](https://greenkeeper.io/)
 
 ## Install
 
 ```bash
-$ npm install react-workflow --save
+$ npm install flow-kit --save
 ```
 
 ## Usage
 
-[View demo online](https://d-band.github.io/react-workflow/)
+[View demo online](https://d-band.github.io/flow-kit/)
 
 ```jsx
 import React from 'react';
 import { render } from 'react-dom';
-import Workflow from 'react-workflow';
+import Workflow from 'flow-kit';
 
 const data = {
   nodes: [
@@ -69,9 +69,9 @@ render(
 
 ## Report a issue
 
-* [All issues](https://github.com/d-band/react-workflow/issues)
-* [New issue](https://github.com/d-band/react-workflow/issues/new)
+* [All issues](https://github.com/d-band/flow-kit/issues)
+* [New issue](https://github.com/d-band/flow-kit/issues/new)
 
 ## License
 
-react-workflow is available under the terms of the MIT License.
+flow-kit is available under the terms of the MIT License.

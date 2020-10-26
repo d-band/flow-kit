@@ -1,5 +1,5 @@
 {
-  "name": "react-workflow",
+  "name": "flow-kit",
   "version": "1.0.0",
   "description": "workflow for react",
   "main": "dist/index.js",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/d-band/react-workflow.git"
+    "url": "git+https://github.com/d-band/flow-kit.git"
   },
   "keywords": [
     "react",
@@ -23,9 +23,9 @@
   "author": "d-band",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/d-band/react-workflow/issues"
+    "url": "https://github.com/d-band/flow-kit/issues"
   },
-  "homepage": "https://github.com/d-band/react-workflow#readme",
+  "homepage": "https://github.com/d-band/flow-kit#readme",
   "devDependencies": {
     "dool": "^4.3.7",
     "eslint": "^7.11.0",
