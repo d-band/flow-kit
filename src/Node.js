@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 
 export default function Node({
-  onSize, children, top, left, className, prefixCls
+  onSize, onClick, children, top, left, className, prefixCls
 }) {
   const elem = useRef(null);
   const oldW = useRef(0);
@@ -22,7 +22,7 @@ export default function Node({
   };
 
   const addObserver = () => {
-    if (!elem.current && typeof MutationObserver !== 'undefined') {
+    if (typeof MutationObserver !== 'undefined') {
       observer.current = new MutationObserver(onChange);
       observer.current.observe(elem.current, {
         attributes: true,
@@ -35,7 +35,7 @@ export default function Node({
 
   const removeObserver = () => {
     if (!observer.current) return;
-    observer.disconnect();
+    observer.current.disconnect();
   };
 
   const ref = (node) => {
@@ -67,7 +67,7 @@ export default function Node({
   };
 
   return (
-    <div ref={ref} className={cls.join(' ')} style={style}>
+    <div ref={ref} className={cls.join(' ')} style={style} onClick={onClick}>
       {children}
     </div>
   );
@@ -76,6 +76,7 @@ export default function Node({
 Node.displayName = 'Node';
 Node.propTypes = {
   onSize: PropTypes.func.isRequired,
+  onClick: PropTypes.func.isRequired,
   children: PropTypes.node,
   top: PropTypes.number,
   left: PropTypes.number,

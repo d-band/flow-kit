@@ -19,7 +19,7 @@ const getRatio = (ctx) => {
   return (window.devicePixelRatio || 1) / backingStore;
 };
 
-const useThrottle = (fn, deps, delay = 20) => {
+const useThrottle = (fn, deps, delay = 50) => {
   const timer = useRef(null);
   const last = useRef(0);
 
@@ -50,27 +50,18 @@ export {
 };
 
 export default function Workflow({
-  data, renderNode, prefixCls, options
+  data, renderNode, onSelect, prefixCls, options, lineColor
 }) {
   const [sizes, setSizes] = useState({});
   const [pos, setPos] = useState({});
   const graph = useRef(null);
-  const layouter = useRef(null);
   const canvas = useRef(null);
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
-  const [edges, setEdges] = useState([]);
-
-  useEffect(() => {
-    if (!layouter.current) {
-      layouter.current = new Layouter();
-    }
-    layouter.current
-      .ltor(options.ltor)
-      .layerMargin(options.layerMargin)
-      .vertexMargin(options.vertexMargin)
-      .edgeMargin(options.edgeMargin);
-  }, [options]);
+  const layouter = useRef(null);
+  const [size, setSize] = useState({
+    width: 0,
+    height: 0
+  });
+  const [lines, setLines] = useState([]);
 
   useEffect(() => {
     graph.current = new Graph();
@@ -83,53 +74,22 @@ export default function Workflow({
     cycleRemoval(graph.current);
   }, [data]);
 
-  const reLayout = () => {
-    if (!graph.current || !layouter.current) return;
-    layouter.current
-      .vertexWidth(({ u }) => {
-        if (sizes[u]) return sizes[u].width;
-        return 0;
-      })
-      .vertexHeight(({ u }) => {
-        if (sizes[u]) return sizes[u].height;
-        return 0;
-      });
-    const layout = layouter.current.layout(graph.current);
-    let maxW = 0;
-    let maxH = 0;
-    const newPos = {};
-    graph.current.vertices().forEach((v) => {
-      const p = layout.vertices[v];
-      maxW = Math.max(maxW, p.x + p.width / 2);
-      maxH = Math.max(maxH, p.y + p.height / 2);
-      newPos[v] = {
-        left: p.x - p.width / 2,
-        top: p.y - p.height / 2
-      };
-    });
-    setWidth(maxW);
-    setHeight(maxH);
-    setPos(newPos);
-    setEdges(graph.current.edges().map(([u, v]) => {
-      const { points } = layout.edges[u][v];
-      return points || [];
-    }));
-  };
-
-  const drawCanvas = () => {
-    if (!canvas.current) return;
+  useThrottle(() => {
+    if (!canvas.current || !layouter.current) return;
     const ctx = canvas.current.getContext('2d');
     const ratio = getRatio(ctx);
+    const width = size.width * ratio;
+    const height = size.height * ratio;
 
-    canvas.current.width = width * ratio;
-    canvas.current.height = height * ratio;
+    canvas.current.width = width;
+    canvas.current.height = height;
 
     ctx.scale(ratio, ratio);
-    ctx.clearRect(0, 0, width * ratio, height * ratio);
-    ctx.strokeStyle = '#09f';
-    ctx.fillStyle = '#09f';
+    ctx.clearRect(0, 0, width, height);
+    ctx.strokeStyle = lineColor;
+    ctx.fillStyle = lineColor;
 
-    const { ltor } = options;
+    const ltor = layouter.current.ltor();
     const stepTo = (p1, p2) => {
       if (ltor) {
         const cx = (p1[0] + p2[0]) / 2;
@@ -155,7 +115,8 @@ export default function Workflow({
         prev = p;
       });
     };
-    edges.forEach((points) => {
+    lines.forEach(({ points, width: w }) => {
+      ctx.lineWidth = w;
       drawLines(points, true);
       ctx.stroke();
 
@@ -173,43 +134,87 @@ export default function Workflow({
       ctx.closePath();
       ctx.fill();
     });
-  };
+  }, [size, lines, lineColor]);
 
   useThrottle(() => {
-    drawCanvas();
-  }, [canvas.current, width, height, edges]);
+    if (!graph.current) return;
+    if (!layouter.current) {
+      layouter.current = new Layouter();
+    }
+    // set options for layouter
+    const opts = {
+      ...options,
+      vertexWidth({ u }) {
+        return sizes[u] ? sizes[u].width : 0;
+      },
+      vertexHeight({ u }) {
+        return sizes[u] ? sizes[u].height : 0;
+      }
+    };
+    Object.keys(opts).forEach((k) => {
+      layouter.current[k](opts[k]);
+    });
+    const layout = layouter.current.layout(graph.current);
+    let maxW = 0;
+    let maxH = 0;
+    const newPos = {};
+    graph.current.vertices().forEach((v) => {
+      const p = layout.vertices[v];
+      maxW = Math.max(maxW, p.x + p.width / 2);
+      maxH = Math.max(maxH, p.y + p.height / 2);
+      newPos[v] = {
+        left: p.x - p.width / 2,
+        top: p.y - p.height / 2
+      };
+    });
+    const newLines = graph.current.edges().map(([u, v]) => {
+      const line = layout.edges[u][v];
+      line.points.forEach((p) => {
+        maxW = Math.max(maxW, p[0] + line.width);
+        maxH = Math.max(maxH, p[1] + line.width);
+      });
+      return line;
+    });
+    setSize({
+      width: Math.ceil(maxW),
+      height: Math.ceil(maxH)
+    });
+    setPos(newPos);
+    setLines(newLines);
+  }, [data, options, sizes]);
 
-  useThrottle(() => {
-    reLayout();
-  }, [data, sizes]);
-
-  const onSize = (id, size) => setSizes(prev => ({
-    ...prev,
-    [id]: size
-  }));
-  const getPos = v => (pos[v.id] || { left: 0, top: 0 });
+  const onSize = (id, s) => setSizes(
+    prev => ({ ...prev, [id]: s })
+  );
+  const getPos = v => ({ left: 0, top: 0, ...pos[v.id] });
   const style = { position: 'relative' };
-  if (width) {
-    style.width = width;
+  if (size.width) {
+    style.width = size.width;
   }
-  if (height) {
-    style.height = height;
+  if (size.height) {
+    style.height = size.height;
   }
   return (
     <div className={`${prefixCls}-container`} style={style}>
       <canvas
         ref={canvas}
         className={`${prefixCls}-canvas`}
-        style={{ width, height, position: 'absolute' }}
+        style={{
+          ...size,
+          left: 0,
+          top: 0,
+          position: 'absolute'
+        }}
       />
       {data.nodes.map(v => (
         <Node
           key={v.id}
           prefixCls={prefixCls}
-          onSize={size => onSize(v.id, size)}
+          onSize={s => onSize(v.id, s)}
           top={getPos(v).top}
           left={getPos(v).left}
           className={v.className}
+          onClick={e => onSelect(v, e)}
         >
           {renderNode(v)}
         </Node>
@@ -225,7 +230,9 @@ Workflow.propTypes = {
     edges: PropTypes.array.isRequired
   }).isRequired,
   renderNode: PropTypes.func.isRequired,
+  onSelect: PropTypes.func,
   prefixCls: PropTypes.string,
+  lineColor: PropTypes.string,
   options: PropTypes.shape({
     ltor: PropTypes.bool,
     layerMargin: PropTypes.number,
@@ -235,10 +242,7 @@ Workflow.propTypes = {
 };
 Workflow.defaultProps = {
   prefixCls: 'workflow',
-  options: {
-    ltor: false,
-    layerMargin: 30,
-    vertexMargin: 30,
-    edgeMargin: 5
-  }
+  lineColor: '#09f',
+  options: {},
+  onSelect: () => {}
 };

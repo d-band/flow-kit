@@ -1,6 +1,6 @@
 {
   "name": "flow-kit",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "workflow for react",
   "main": "dist/index.js",
   "scripts": {
@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/d-band/flow-kit#readme",
   "devDependencies": {
+    "bpmn-font": "^0.10.0",
     "dool": "^4.3.7",
     "eslint": "^7.11.0",
     "eslint-config-airbnb": "^18.1.0",
@@ -37,7 +38,10 @@
     "gh-pages": "^3.1.0",
     "prop-types": "^15.7.2",
     "react": "^16.14.0",
-    "react-dom": "^16.14.0"
+    "react-dom": "^16.14.0",
+    "sass": "^1.27.1",
+    "sass-loader": "^10.0.4",
+    "spectre.css": "^0.5.9"
   },
   "peerDependencies": {
     "prop-types": ">=15.0.0",
