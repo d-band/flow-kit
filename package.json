@@ -7,7 +7,7 @@
     "lint": "eslint --ext .js src",
     "dev": "cd demo && dool server",
     "prepare": "dool build",
-    "pages": "cd demo && dool build && gh-pages -d ."
+    "pages": "cd demo && dool build && cp index.html dist && gh-pages -d dist"
   },
   "repository": {
     "type": "git",
